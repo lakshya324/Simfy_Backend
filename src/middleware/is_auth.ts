@@ -3,7 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { AuthRequest } from "../types/type";
 import { secretKey } from "../config/config";
 
-module.exports = (req: AuthRequest, res: Response, next: NextFunction) => {
+export default (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.get('Authorization');
   if (!authHeader) {
     const error = new Error('Not authenticated.') as any;
@@ -24,6 +24,7 @@ module.exports = (req: AuthRequest, res: Response, next: NextFunction) => {
     error.statusCode = 401;
     throw error;
   }
+  // console.log(">",decodedToken);
   req.userId = decodedToken.userId;
   next();
 };
