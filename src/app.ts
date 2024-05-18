@@ -28,39 +28,39 @@ app.use((req: AuthRequest, res: Response, next: NextFunction) => {
 });
 
 //* socket.io Auth middleware
-// io.use(async (socket: Socket, next: (err?: Error) => void) => {
-//   const token = socket.handshake.auth.token;
-//     if (token) {
-//       try {
-//         const decodedToken= await jwt.verify(token, secretKey) as JwtPayload;
-//         if (!decodedToken) {
-//           return next(new Error('Authentication error'));
-//         }else{
-//           (socket as AuthSocket).userId = decodedToken.userId;
-//           next();
-//         }
-//       } catch (err) {
-//         return next(new Error('Authentication error'));
-//       }
-//     } else {
-//         return next(new Error('Authentication error'));
-//     }
-// })
+io.use(async (socket: Socket, next: (err?: Error) => void) => {
+  const token = socket.handshake.auth.token;
+    if (token) {
+      try {
+        const decodedToken= await jwt.verify(token, secretKey) as JwtPayload;
+        if (!decodedToken) {
+          return next(new Error('Authentication error'));
+        }else{
+          (socket as AuthSocket).userId = decodedToken.userId;
+          next();
+        }
+      } catch (err) {
+        return next(new Error('Authentication error'));
+      }
+    } else {
+        return next(new Error('Authentication error'));
+    }
+})
 
-// // socket.io connection
-// io.on("connection", (socket: AuthSocket) => {
-//   // Todo: update online db, load offline message from dispose db
+// socket.io connection
+io.on("connection", (socket: AuthSocket) => {
+  // Todo: update online db, load offline message from dispose db
 
   
-//   socket.on("message", (msg) => {
-//     // Todo: send message, recieve message
-//     // Todo: save message to chat db(if send) else save to dispose db
-//   });
+  socket.on("message", (msg) => {
+    // Todo: send message, recieve message
+    // Todo: save message to chat db(if send) else save to dispose db
+  });
 
-//   socket.on("disconnect", () => {
-//     // Todo: remove from online db
-//   });
-// });
+  socket.on("disconnect", () => {
+    // Todo: remove from online db
+  });
+});
 
 app.use(cors());
 app.use(bodyParser.json()); // application/json
