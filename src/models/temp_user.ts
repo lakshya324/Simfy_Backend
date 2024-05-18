@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { TempTime } from "../config/config";
+import { tempTime } from "../config/config";
 
 const tempUserSchema = new Schema({
   user: {
@@ -19,7 +19,7 @@ const tempUserSchema = new Schema({
   // expireAt: {
   //   type: Date,
   //   default: Date.now,
-  //   index: { expires: TempTime },
+  //   index: { expires: tempTime },
   // },
   emailLastSent: {
     type: Date,

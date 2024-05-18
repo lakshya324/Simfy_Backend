@@ -67,17 +67,26 @@ router.post(
   authController.postResend
 );
 
-//Todo: add forgot password
-// router.post("/reset",[
-//   check("email", "Please enter a valid email.")
-//     .isEmail()
-//     .normalizeEmail(),
-// ],authController.postForgot);
+router.post("/otp",[
+  check("email", "Please enter a valid email.")
+    .isEmail()
+    .normalizeEmail(),
+],authController.postGenerateOTP);
 
-// router.get("/reset/:userId",authController.getResetPage);
+router.post("/reset",[
+  check("email", "Please enter a valid email.")
+    .isEmail()
+    .normalizeEmail(),
+  body(
+    "password",
+    "Please enter a password with only numbers and text and at least 5 characters."
+  )
+    .isLength({ min: 5 })
+    .isAlphanumeric()
+    .trim(),
+  body("otp", "Please enter a valid OTP.").not().isEmpty().trim(),
+],authController.postResetPassword);
 
 router.delete("/delete",isAuth,authController.getDelete);
-
-//reset password , verify email, resend email, delete account
 
 export default router;

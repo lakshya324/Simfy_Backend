@@ -14,6 +14,7 @@ export const transporter ={
     },
 }
 export const url = process.env.URL!;
-export const TempTime = process.env.TEMP_TIME || 120; // 120 seconds = 2 minutes
+export const tempTime = process.env.TEMP_TIME || 120; // 120 seconds = 2 minutes
 export const jwtExpireTime = process.env.JWT_EXPIRE_TIME || "1h"; // 1 hour
 export const emailCoolDownTimeinMin = +process.env.EMAIL_COOLDOWN_TIME!; // in minute
+export const expireTimeOTP = +process.env.OTP_EXPIRE_TIME!; // in minute

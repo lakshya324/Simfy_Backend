@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from "express";
+import { Socket } from "socket.io";
 
 export interface AuthRequest extends Request {
+    userId?: string;
+}
+
+export interface AuthSocket extends Socket {
     userId?: string;
 }
 

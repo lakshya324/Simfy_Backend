@@ -1,5 +1,6 @@
 import CryptoJS from "crypto-js";
 import { secretKey } from "../config/config";
+import {v4 as uuidv4} from "uuid";
 
 // Function to encode a string
 export function encodeString(text: string): string | null {
@@ -20,4 +21,8 @@ export function decodeString(encodedText: string): string | null {
   } catch (error) {
     return null;
   }
+}
+
+export function generateOTP(int:number):string {
+  return uuidv4().split("-").join("").slice(0,int);
 }

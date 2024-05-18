@@ -11,9 +11,10 @@ import {
   validationMail,
   verifiedMail,
   forgotPasswordMail,
+  passwordChangedMail,
 } from "../utils/emails";
-import { decodeString } from "../utils/encoding";
-import { connections } from "mongoose";
+import { decodeString, generateOTP } from "../utils/encoding";
+import OTP from "../models/otp";
 
 export const postSignup = async (
   req: AuthRequest,
@@ -190,6 +191,8 @@ export const postResend = async (
     } else {
       try {
         validationMail(email, temp_user._id.toString());
+        temp_user.emailLastSent = new Date();
+        await temp_user.save();
       } catch (error) {
         console.log(`Error While Sending Emails in Resend: ${error}`);
       }
@@ -243,6 +246,122 @@ export const getDelete = async (
     }
     await User.findByIdAndDelete(userId);
     return res.status(200).json({ message: "User Deleted!" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const postGenerateOTP = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error(`Validation Error! ${errors.array()[0].msg}`);
+      (error as StatusError).statusCode = 422;
+      return next(error);
+    }
+
+    const email = req.body.email;
+
+    const isTempUser = await TempUser.findOne({ "user.email": email });
+    if (isTempUser) {
+      const error = new Error("Please verify your email first!");
+      (error as StatusError).statusCode = 422;
+      return next(error);
+    }
+
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      const error = new Error("User not found!");
+      (error as StatusError).statusCode = 404;
+      return next(error);
+    }
+
+    const isAlreadySent = await OTP.findOne({ email: email });
+    if (isAlreadySent) {
+      return res.status(200).json({ message: "OTP already sent!" });
+    }
+    const otp = generateOTP(6);
+    const otpDoc = new OTP({
+      email: email,
+      otp: otp,
+    });
+    try {
+      await otpDoc.save();
+    } catch (error) {
+      return next(error);
+    }
+    try {
+      forgotPasswordMail(email, otp);
+    } catch (error) {
+      console.log(`Error While Sending Emails in Forgot: ${error}`);
+    }
+    return res.status(200).json({ message: "OTP sent!" });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+export const postResetPassword = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      const error = new Error(`Validation Error! ${errors.array()[0].msg}`);
+      (error as StatusError).statusCode = 422;
+      return next(error);
+    }
+
+    const email = req.body.email;
+    const otp = req.body.otp;
+    const password = req.body.password;
+
+    const isTempUser = await TempUser.findOne({ "user.email": email });
+    if (isTempUser) {
+      const error = new Error("Please verify your email first!");
+      (error as StatusError).statusCode = 422;
+      return next(error);
+    }
+
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      const error = new Error("User not found!");
+      (error as StatusError).statusCode = 404;
+      return next(error);
+    }
+
+    const otpDoc = await OTP.findOne({ email: email });
+    if (!otpDoc) {
+      const error = new Error("OTP not found!");
+      (error as StatusError).statusCode = 404;
+      return next(error);
+    }
+    if (otpDoc.otp.toString() !== otp.toString()) {
+      const error = new Error("Invalid OTP!");
+      (error as StatusError).statusCode = 401;
+      return next(error);
+    }
+    const encryptedPassword = await bcrypt.hash(password, saltRounds);
+    user.password = encryptedPassword;
+    try {
+      await user.save();
+      await OTP.findByIdAndDelete(otpDoc._id);
+    } catch (error) {
+      return next(error);
+    }
+
+    try {
+      passwordChangedMail(email);
+    } catch (error) {
+      console.log(`Error While Sending Emails in Reset: ${error}`);
+    }
+    return res.status(200).json({ message: "Password Reset!" });
   } catch (error) {
     return next(error);
   }
