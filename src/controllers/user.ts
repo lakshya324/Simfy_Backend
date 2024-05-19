@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
 import { saltRounds } from "../config/config";
 import ConnectionDB from "../models/connection";
-import { connectionRequestMail } from "../utils/emails";
+import { connectionRequestMail } from "../emails/emailUtils";
 import { decodeString } from "../utils/encoding";
 
 export const getUser = async (
@@ -207,11 +207,14 @@ export const acceptConnectionRequest = async (
       from: connection.to,
       last_updated: Date.now(),
     });
-    await Promise.all([
-      user_to.save(),
-      user_from.save(),
-      ConnectionDB.findByIdAndDelete(connectionId),
-    ]);
+      await user_to.save();
+      await user_from.save();
+      await ConnectionDB.findByIdAndDelete(connectionId);
+    // await Promise.all([
+    //   user_to.save(),
+    //   user_from.save(),
+    //   ConnectionDB.findByIdAndDelete(connectionId),
+    // ]);
     return res.status(200).json({ message: "Connection Request Accepted!" });
   } catch (error) {
     return next(error);

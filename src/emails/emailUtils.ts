@@ -1,6 +1,6 @@
 import Transporter from "./transporter";
 import { transporter, url, emailCoolDownTimeinMin, expireTimeOTP } from "../config/config";
-import { encodeString } from "./encoding";
+import { encodeString } from "../utils/encoding";
 
 export function validationMail(email: string, id: string) {
   Transporter.sendMail({
@@ -9,7 +9,7 @@ export function validationMail(email: string, id: string) {
     subject: "Validate your email",
     html: `
     <h1>Click the link below to validate your email</h1>
-    <a href="${url}/verify/${encodeString(id)}">Click here</a>
+    <a href="${url}/validate/verify/${encodeString(id)}">Click here</a>
     `,
   });
 }
@@ -34,8 +34,8 @@ export function emailCoolDown(time: Date) {
   return true;
 }
 
-export function forgotPasswordMail(email: string, otp: string) {
-  Transporter.sendMail({
+export async function forgotPasswordMail(email: string, otp: string) {
+  await Transporter.sendMail({
     to: email,
     from: transporter.auth.user,
     subject: "Reset Password",

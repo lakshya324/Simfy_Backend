@@ -1,7 +1,7 @@
 import path from "path";
 import express, { Request, Response, NextFunction } from "express";
 import bodyParser from "body-parser";
-import mongoose, { Connection } from "mongoose";
+import mongoose from "mongoose";
 import cors from "cors";
 import { mongoDbUri, port, secretKey } from "./config/config";
 import authRoutes from "./routes/auth";
@@ -20,6 +20,7 @@ import {
   saveMessageToChatDB,
   saveMessageToDisposeDB,
 } from "./utils/save-message";
+import validateRoutes from "./routes/validation";
 
 const app = express();
 const server = createServer(app);
@@ -61,11 +62,12 @@ io.on("connection", async (socket: Socket) => {
   // Todo: update online db, load offline message from dispose db
   // const userId = socket.userId!;
   const socketId = socket.id;
+  console.log(`Socket ${socketId} connected!`);
   var userId: string;
 
   //log middleware
   socket.onAny((event, ...args) => {
-    console.log(`Socket Event: ${event} with args: ${args} by user: ${userId}`);
+    console.log("\x1b[33m%s\x1b[0m",`Socket Event: ${event} by user: ${userId} with args: ${args.toString()}`);
   });
 
   socket.on("authenticate", async ({ token }) => {
@@ -100,9 +102,9 @@ io.on("connection", async (socket: Socket) => {
 
         //load connections and offline message from dispose db
         try {
-          const messages = dispose(userId);
-          const connections = getAllConnections(userId);
-          await Promise.all([messages, connections]);
+          const messages = await dispose(userId);
+          const connections = await getAllConnections(userId);
+          // await Promise.all([messages, connections]);
           if (messages && connections) {
             socket.emit("message", {
               isFlagActive: false,
@@ -127,27 +129,19 @@ io.on("connection", async (socket: Socket) => {
     }
   });
 
-  socket.on("message", async ({ to, type, data, onPage }) => {
+  socket.on("message", async ({ to, type, data }) => {
     // Todo: send message, recieve message, update last chat time
     // Todo: save message to chat db(if send) else save to dispose db
     // Todo: check connection then send message
 
+    // Check if user is authenticated
     if (!userId) {
       console.log(`User not found! Socket ${socketId} disconnected!`);
       socket.disconnect();
       return;
     }
-    console.log(
-      "Message from:",
-      userId,
-      "to:",
-      to,
-      "type:",
-      type,
-      "data:",
-      data
-    );
 
+    // Check if reciver is valid
     const reciver = await User.findById(to);
     if (!reciver) {
       console.log("Reciver not found!");
@@ -161,20 +155,21 @@ io.on("connection", async (socket: Socket) => {
       const recieverSocketId = await isUserOnline(to);
       if (recieverSocketId) {
         //* send to reciever
-        // await saveMessageToChatDB(converstionDataToChat(message_stuctured, onPage));
-        // await updateLastChatTime(userId, to);
-        await Promise.all([
-          saveMessageToChatDB(converstionDataToChat(message_stuctured, onPage)),
-          updateLastChatTime(userId, to),
-        ]);
-        io.to(recieverSocketId).emit("message", { from: userId, type, data });
+        await saveMessageToChatDB(converstionDataToChat(message_stuctured));
+        await updateLastChatTime(userId, to);
+        // await Promise.all([
+        //   saveMessageToChatDB(converstionDataToChat(message_stuctured, onPage)),
+        //   updateLastChatTime(userId, to),
+        // ]);
+        io.to(recieverSocketId).emit("message", { isFlagActive:true,from: userId, type, data });
       } else {
         //* save to dispose db
-        // await saveMessageToDisposeDB(message_stuctured);
-        await Promise.all([
-          saveMessageToDisposeDB(message_stuctured),
-          updateLastChatTime(userId, to),
-        ]);
+        await saveMessageToDisposeDB(message_stuctured);
+        await updateLastChatTime(userId, to);
+        // await Promise.all([
+        //   saveMessageToDisposeDB(message_stuctured),
+        //   updateLastChatTime(userId, to),
+        // ]);
       }
     } catch (error) {
       console.log("Error in sending message. Error:", error);
@@ -185,7 +180,12 @@ io.on("connection", async (socket: Socket) => {
 
   socket.on("disconnect", () => {
     // Todo: remove from online db
-    await userOffline(userId, socketId);
+    if (!userId) {
+      console.log(`User not found! Socket ${socketId} disconnected!`);
+      return;
+    }
+    console.log(`User ${userId} disconnected!`);
+    userOffline(userId);
   });
 });
 
@@ -195,8 +195,11 @@ app.use(bodyParser.json()); // application/json
 //Todo: Load and Change images for Chats and profile pictures
 app.use("/images", express.static(path.join(__dirname, "../public/images")));
 
+//TODO: Message Seen Mechanism
 app.use(authRoutes);
 app.use("/user", userRoutes);
+app.use("/validate", validateRoutes);
+// app.use("/chat", chatRoutes); // Todo: fetch all chats
 app.use("/ml", mlRoutes);
 
 app.use(

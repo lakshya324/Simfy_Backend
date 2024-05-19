@@ -43,7 +43,8 @@ export async function dispose(userId: string): Promise<Dispose[] | undefined> {
         //move to chat collection and delete from dispose collection
         await ChatDB.insertMany(saveChats);
         await DisposeDB.deleteMany({ _id: { $in: disposeChatsId } });
-
+        
+        console
         return disposeMessages;
     }
 }

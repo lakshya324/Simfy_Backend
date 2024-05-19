@@ -36,5 +36,6 @@ router.get("/request/reject/:connectionId", userController.rejectConnectionReque
 
 // chats, profile, start_connection 
 //Todo: Add routes for chats which also load messages from dispose which is send by user
+//Todo: add change profile image route, change unique username route
 
 export default router;
