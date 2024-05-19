@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { AuthRequest } from "../types/type";
+import { AuthRequest } from "../types/types";
 import { secretKey } from "../config/config";
 
 export default (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -24,7 +24,7 @@ export default (req: AuthRequest, res: Response, next: NextFunction) => {
     error.statusCode = 401;
     throw error;
   }
-  // console.log(">",decodedToken);
+  console.log(">",decodedToken);
   req.userId = decodedToken.userId;
   next();
 };

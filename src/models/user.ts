@@ -25,6 +25,10 @@ const userSchema = new Schema({
     type: String,
     default: "I am new!",
   },
+  feeling: {
+    type: String,
+    default: "normal",
+  },
   profileImage: {
     type: String,
     default: url+"/images/default/default.png",
@@ -42,7 +46,11 @@ const userSchema = new Schema({
         required: true,
       },
     }
-  ]
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 export default mongoose.model("User", userSchema);

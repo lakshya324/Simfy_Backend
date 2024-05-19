@@ -57,3 +57,16 @@ export function passwordChangedMail(email: string) {
     `,
   });
 }
+
+export function connectionRequestMail(email: string, uniqueName:string, name: string, id: string) {
+  Transporter.sendMail({
+    to: email,
+    from: transporter.auth.user,
+    subject: "Connection Request",
+    html: `
+    <h1>${uniqueName} [${name}] wants to connect with you</h1>
+    <a href="${url}/user/request/accept/${encodeString(id)}">Accept</a>
+    <a href="${url}/user/request/reject/${encodeString(id)}">Reject</a>
+    `,
+  });
+}

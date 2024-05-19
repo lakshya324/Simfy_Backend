@@ -7,6 +7,8 @@ const router = Router();
 
 router.get('/', isAuth, userController.getUser);
 
+//Todo: Add routes for loding other users (connections) profile
+
 router.post("/update",[
     check("name", "Please enter a valid name.").not().isEmpty().trim(),
     check("email", "Please enter a valid email.")
@@ -25,6 +27,14 @@ router.post("/update",[
 
 router.get("/connections", isAuth, userController.getConnections);
 
+router.post("/request", isAuth, userController.postSendConnectionRequest);
+
+router.get("/request/accept/:connectionId", userController.acceptConnectionRequest);
+
+router.get("/request/reject/:connectionId", userController.rejectConnectionRequest);
+
+
 // chats, profile, start_connection 
+//Todo: Add routes for chats which also load messages from dispose which is send by user
 
 export default router;

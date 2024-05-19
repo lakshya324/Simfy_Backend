@@ -1,6 +1,6 @@
 import { Router, Response } from "express";
 import isAuth from "../middleware/is_auth";
-import { AuthRequest } from "../types/type";
+import { AuthRequest } from "../types/types";
 import User from "../models/user";
 
 const router = Router();

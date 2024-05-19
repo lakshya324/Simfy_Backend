@@ -13,7 +13,7 @@ const waitingSchema = new Schema(
       required: true,
     },
     message: {
-      type: {
+      message_type: {
         type: String,
         required: true,
       },

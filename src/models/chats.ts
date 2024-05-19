@@ -13,7 +13,7 @@ const chatSchema = new Schema(
       required: true,
     },
     message: {
-      type: {
+      message_type: {
         type: String,
         required: true,
       },
@@ -36,12 +36,11 @@ const chatSchema = new Schema(
         type: Date,
         default: Date.now,
       },
-      sent_time: {
-        type: Date,
-      },
+    },
+    sent_time: {
+      type: Date,
     },
   },
-  { timestamps: false }
 );
 
 export default mongoose.model("Chat", chatSchema);
