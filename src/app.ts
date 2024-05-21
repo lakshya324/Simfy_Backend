@@ -21,6 +21,7 @@ import {
   saveMessageToDisposeDB,
 } from "./utils/save-message";
 import validateRoutes from "./routes/validation";
+import chatRoutes from "./routes/chats";
 
 const app = express();
 const server = createServer(app);
@@ -199,7 +200,7 @@ app.use("/images", express.static(path.join(__dirname, "../public/images")));
 app.use(authRoutes);
 app.use("/user", userRoutes);
 app.use("/validate", validateRoutes);
-// app.use("/chat", chatRoutes); // Todo: fetch all chats
+app.use("/chats", chatRoutes); // Todo: fetch all chats
 app.use("/ml", mlRoutes);
 
 app.use(
