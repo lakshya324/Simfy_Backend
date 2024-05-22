@@ -27,13 +27,15 @@ export function converstionDataToChat(message:Dispose,onPage:boolean = false): C
     };;
 }
 
-export async function saveMessageToChatDB(message:Chat) {
+export async function saveMessageToChatDB(message:Chat):Promise<string|undefined> {
     //save to chat collection
     try{
         const saveChat = new ChatDB(message);
         await saveChat.save();
+        return saveChat._id.toString();
     } catch (error) {
         console.log("Error in saving message to chat db. Error:", error);
+        return;
     }
 }
 

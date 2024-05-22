@@ -4,6 +4,9 @@ import * as chatController from "../controllers/chats";
 
 const router = Router();
 
+//todo: Add messages from dispose db
+//todo: Add online status of user
+//todo: change status of messages to seen
 router.get("/:receiverUniqueName", isAuth,chatController.getChat);
 
 //Todo: Add routes for mark as seen messages
