@@ -26,6 +26,11 @@ const waitingSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    chatId: {
+      type: Schema.Types.ObjectId,
+      ref: "Chat",
+      required: true,
+    },
   }
 );
 

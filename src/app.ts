@@ -23,6 +23,7 @@ import {
 import validateRoutes from "./routes/validation";
 import chatRoutes from "./routes/chats";
 import setupSocket from "./socket";
+import OnlineDB from "./models/active";
 
 const app = express();
 const server = createServer(app);
@@ -219,7 +220,10 @@ app.use(
 
 mongoose
   .connect(mongoDbUri)
-  .then((result) => {
+  .then(async (result) => {
+    // Remove all users in Online Collection
+    await OnlineDB.deleteMany({});
+
     server.listen(port, () =>
       console.log("\x1b[36m%s\x1b[0m", `Server started on port ${port}`)
     );

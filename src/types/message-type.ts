@@ -14,6 +14,6 @@ export interface Chat extends Dispose {
     meta_data: {
         read: boolean;
         seen_time: Date | null;
-        delivered_time: Date;
+        delivered_time: Date | null;
     };
 }

@@ -16,13 +16,13 @@ export function converstionData(from:string,to: string, type: string, data: stri
     return disposeChat;
 }
 
-export function converstionDataToChat(message:Dispose,onPage:boolean = false): Chat {
+export function converstionDataToChat(message:Dispose,delivered:boolean = true): Chat {
     return {
         ...message,
         meta_data: {
-            read: onPage,
-            seen_time: onPage ? new Date() : null,
-            delivered_time: new Date(),
+            read: false,
+            seen_time: null,
+            delivered_time: delivered ? new Date() : null,
         },
     };;
 }
@@ -39,10 +39,10 @@ export async function saveMessageToChatDB(message:Chat):Promise<string|undefined
     }
 }
 
-export async function saveMessageToDisposeDB(message:Dispose) {
+export async function saveMessageToDisposeDB(message:Dispose,chatId:string) {
     //save to dispose collection
     try{
-        const saveDispose = new DisposeDB(message);
+        const saveDispose = new DisposeDB({...message,chatId});
         await saveDispose.save();
     } catch (error) {
         console.log("Error in saving message to dispose db. Error:", error);
