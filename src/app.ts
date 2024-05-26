@@ -36,7 +36,7 @@ app.use((req: AuthRequest, res: Response, next: NextFunction) => {
 //* Seting up Socket
 setupSocket(io);
 
-//Todo: Load and Change images for Chats and profile pictures
+//TODO: Add Default to S3 Bucket	
 app.use("/images", express.static(path.join(__dirname, "../public/images")));
 
 //* Routes

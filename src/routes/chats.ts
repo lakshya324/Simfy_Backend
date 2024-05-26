@@ -5,9 +5,9 @@ import upload from "../middleware/multer";
 
 const router = Router();
 
-//todo: Add messages from dispose db
-//todo: Add online status of user
-//todo: change status of messages to seen
+//TODO: Add messages from dispose db
+//TODO: Add online status of user
+//TODO: change status of messages to seen
 
 //* Fetch all chat between two users and mark messages as seen
 router.get("/:receiverUniqueName", isAuth,chatController.getChat);
@@ -20,7 +20,7 @@ router.post(
   chatController.uploadImage
 );
 
-//Todo: image delete implementation for images not connected to any chat
+//TODO: image delete implementation for images not connected to any chat
 // router.get("/delete", async (req: AuthRequest, res: Response) => {
 //   console.log("Delete images without chatId");
 //   //delete all images which dont have chatId parameter

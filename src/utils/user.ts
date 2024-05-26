@@ -21,7 +21,7 @@ export async function getAllConnections(userId: string) {
   }
 }
 
-//Todo: Error handling [Break if connection not found]
+//TODO: Error handling [Break if connection not found]
 export async function updateLastChatTime(userId1: string, userId2: string) {
   try {
     // console.log("User1:", userId1, "User2:", userId2);

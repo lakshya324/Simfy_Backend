@@ -38,9 +38,9 @@ router.get("/request/reject/:connectionId", userController.rejectConnectionReque
 
 
 // chats, profile, start_connection 
-//Todo: Add routes for loading other users (connections) profile
-//Todo: Change Email
-//Todo: Change and set Unique Name
-//Todo: Change profile image route
+//TODO: Add routes for loading other users (connections) profile
+//TODO: Change Email
+//TODO: Change and set Unique Name
+//TODO: Change profile image route [Image Upload]
 
 export default router;

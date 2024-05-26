@@ -34,7 +34,7 @@ export default (socket: Socket, userId: string) => {
       return;
     }
 
-    //todo: outsource this to a separate function
+    //TODO: outsource this to a separate function
     const disposeMessageStructured = converstionData(userId, to, type, data);
     try {
       const messageId = await saveMessageToChatDB(

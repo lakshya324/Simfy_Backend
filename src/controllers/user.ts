@@ -87,7 +87,7 @@ export const postUpdate = async (
   }
 };
 
-// Todo: modifty this function to get connections details as well
+// TODO: modifty this function to get connections details as well
 export const getConnections = async (
   req: AuthRequest,
   res: Response,

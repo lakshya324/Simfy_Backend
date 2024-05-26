@@ -29,7 +29,7 @@ export default async (socket: Socket, token: string) => {
     await userOnline(userId, socketId);
 
     //load connections and offline message from dispose db
-    //Todo: outsource this to a separate function
+    //TODO: outsource this to a separate function
     const messages = await dispose(userId);
     const connections = await getAllConnections(userId);
     console.log("Messages:", messages);
