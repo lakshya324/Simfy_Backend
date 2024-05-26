@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { AuthRequest, StatusError } from "../types/types";
 import User from "../models/user";
 import ChatDB from "../models/chats";
+import { deliveredDispose } from "../utils/dispose";
 
 export const getChat = async (
   req: AuthRequest,
@@ -9,8 +10,8 @@ export const getChat = async (
   next: NextFunction
 ) => {
   try {
-    const userId = req.userId;
-    const { uniqueName } = req.body;
+    const userId = req.userId!;
+    const uniqueName = req.params.receiverUniqueName;
     const receiver = await User.findOne({ uniqueName });
     if (!receiver) {
       const error = new Error("Receiver not found!");
@@ -37,6 +38,7 @@ export const getChat = async (
 
     const chats = await ChatDB.find({$or: [{ from: userId, to: receiverId }, { from: receiverId, to: userId }]}).sort({ sent_time: 1 });
     // 1 for ascending order and -1 for descending order
+    await deliveredDispose(userId, receiverId);
     return res.status(200).json({ chats: chats });
   } catch (error) {
     return next(error);

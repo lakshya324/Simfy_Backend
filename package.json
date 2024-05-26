@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon dist/app.js",
+    "start": "node dist/app.js",
     "build": "tsc -p .",
-    "dev": "tsc-watch --onSuccess \"node dist/app.js\"",
+    "dev": "tsc-watch --onSuccess \"npm start\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

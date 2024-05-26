@@ -11,9 +11,9 @@ export default (io: Server) => {
     var userId: string;
     
     //* log middleware
-    // socket.onAny((event, ...args) => {
-    //   console.log("\x1b[33m%s\x1b[0m",`=> Event: ${event}, Args: ${args}`);
-    // });
+    socket.onAny((event, ...args) => {
+      console.log("\x1b[33m%s\x1b[0m",`SOCKET > ${event} => ${socket.id} [${userId ? `User ${userId}` : "User not authenticated"}]`);
+    });
 
     socket.on("authenticate", async ({ token },ack) => {
       userId = await authenticateHandler(socket, token);
@@ -38,69 +38,3 @@ export default (io: Server) => {
     });
   });
 };
-
-// export const setupSocket = (io: Server) => {
-//   io.on("connection", (socket) => {
-//     connectionHandler(io)(socket);
-
-//     socket.on("authenticate", async ({ token }) => {
-//       const socketId = socket.id;
-//       if (token) {
-//         try {
-//           const decodedToken = jwt.verify(token, secretKey) as JwtPayload;
-//           if (!decodedToken) {
-//             console.log("Authentication error");
-//             socket.disconnect();
-//             return;
-//           }
-
-//           // set userId
-//           const userId = decodedToken.userId;
-
-//           // check user in db
-//           const user = await User.findById(userId);
-//           if (!user) {
-//             console.log("User not found!");
-//             socket.disconnect();
-//             return;
-//           }
-
-//           // set user online
-//           try {
-//             await userOnline(userId, socketId);
-//           } catch (error) {
-//             console.log("Error in setting user online. Error:", error);
-//             socket.disconnect();
-//             return;
-//           }
-
-//           //load connections and offline message from dispose db
-//           try {
-//             const messages = await dispose(userId);
-//             const connections = await getAllConnections(userId);
-//             // await Promise.all([messages, connections]);
-//             if (messages && connections) {
-//               socket.emit("message", {
-//                 isFlagActive: false,
-//                 Connections: connections,
-//                 Messages: messages,
-//               });
-//             }
-//           } catch (error) {
-//             console.log("Error in loading offline message. Error:", error);
-//             socket.disconnect();
-//             return;
-//           }
-//         } catch (err) {
-//           console.log("Authentication error:", err);
-//           socket.disconnect();
-//           return;
-//         }
-//       } else {
-//         console.log("Authentication error");
-//         socket.disconnect();
-//         return;
-//       }
-//     });
-//   });
-// };

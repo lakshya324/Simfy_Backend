@@ -24,7 +24,7 @@ export default (req: AuthRequest, res: Response, next: NextFunction) => {
     error.statusCode = 401;
     throw error;
   }
-  console.log(">",decodedToken);
+  // console.log(">",decodedToken);
   req.userId = decodedToken.userId;
   next();
 };
