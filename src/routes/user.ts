@@ -5,15 +5,14 @@ import { check, body } from 'express-validator';
 
 const router = Router();
 
+//* Fetch User Profile
 router.get('/', isAuth, userController.getUser);
 
-//Todo: Add routes for loding other users (connections) profile
-
+//* Update User Profile
 router.post("/update",[
     check("name", "Please enter a valid name.").not().isEmpty().trim(),
     check("email", "Please enter a valid email.")
-      .isEmail()
-      .normalizeEmail(),
+      .isEmail(),
     body(
       "password",
       "Please enter a password with only numbers and text and at least 5 characters."
@@ -25,18 +24,23 @@ router.post("/update",[
     // body("profileImage", "Please enter a valid image url.").not().isEmpty().trim(),
   ],isAuth, userController.postUpdate);
 
+//* Get All Connections made by User
 router.get("/connections", isAuth, userController.getConnections);
 
-router.post("/request", isAuth, userController.postSendConnectionRequest);
+//* Send connection request using Unique Name
+router.post("/request", isAuth, userController.sendConnectionRequest);
 
+//* Accept Connection
 router.get("/request/accept/:connectionId", userController.acceptConnectionRequest);
 
+//* Reject Connection
 router.get("/request/reject/:connectionId", userController.rejectConnectionRequest);
 
 
 // chats, profile, start_connection 
-//Todo: Add routes for chats which also load messages from dispose which is send by user
-//Todo: add change profile image route, change unique username route
 //Todo: Add routes for loading other users (connections) profile
+//Todo: Change Email
+//Todo: Change and set Unique Name
+//Todo: Change profile image route
 
 export default router;

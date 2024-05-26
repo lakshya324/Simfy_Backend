@@ -27,7 +27,9 @@ export const getUser = async (
       (error as StatusError).statusCode = 404;
       return next(error);
     }
-    return res.status(200).json({ user: user });
+    return res
+      .status(200)
+      .json({ success: true, message: "User Data", data: { user: user } });
   } catch (error) {
     return next(error);
   }
@@ -79,7 +81,7 @@ export const postUpdate = async (
       return next(error);
     }
 
-    return res.status(200).json({ message: "User Updated!" });
+    return res.status(200).json({ success: true, message: "User Updated!" });
   } catch (error) {
     return next(error);
   }
@@ -106,20 +108,24 @@ export const getConnections = async (
       (error as StatusError).statusCode = 404;
       return next(error);
     }
-    return res.status(200).json({ connections: user.connections });
+    return res.status(200).json({
+      success: true,
+      message: "User Connections",
+      data: { connections: user.connections },
+    });
   } catch (error) {
     return next(error);
   }
 };
 
-export const postSendConnectionRequest = async (
+export const sendConnectionRequest = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const userId = req.userId;
-    const connectionUniqueName: string = req.body.uniqueName;
+    const connectionUniqueName: string = req.body.unique_name;
     if (!userId || !connectionUniqueName) {
       const error = new Error(
         `Invalid User Id or Connection Id! ${userId} ${connectionUniqueName}`
@@ -162,12 +168,13 @@ export const postSendConnectionRequest = async (
       user.name,
       newConnection._id.toString()
     );
-    return res
-      .status(200)
-      .json({
+    return res.status(200).json({
+      success: true,
+      message: "Connection Request Sent!",
+      data: {
         connectionId: newConnection._id.toString(),
-        message: "Connection Request Sent!",
-      });
+      },
+    });
   } catch (error) {
     return next(error);
   }
@@ -207,15 +214,17 @@ export const acceptConnectionRequest = async (
       from: connection.to,
       last_updated: Date.now(),
     });
-      await user_to.save();
-      await user_from.save();
-      await ConnectionDB.findByIdAndDelete(connectionId);
+    await user_to.save();
+    await user_from.save();
+    await ConnectionDB.findByIdAndDelete(connectionId);
     // await Promise.all([
     //   user_to.save(),
     //   user_from.save(),
     //   ConnectionDB.findByIdAndDelete(connectionId),
     // ]);
-    return res.status(200).json({ message: "Connection Request Accepted!" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Connection Request Accepted!" });
   } catch (error) {
     return next(error);
   }
@@ -240,7 +249,9 @@ export const rejectConnectionRequest = async (
       return next(error);
     }
     await ConnectionDB.findByIdAndDelete(connectionId);
-    return res.status(200).json({ message: "Connection Request Rejected!" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Connection Request Rejected!" });
   } catch (error) {
     return next(error);
   }

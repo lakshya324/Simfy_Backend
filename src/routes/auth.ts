@@ -20,8 +20,7 @@ router.post(
             );
           }
         });
-      })
-      .normalizeEmail(),
+      }),
     body(
       "password",
       "Please enter a password with only numbers and text and at least 5 characters."
@@ -36,7 +35,7 @@ router.post(
 router.post(
   "/login",
   [
-    check("email", "Please enter a valid email.").isEmail().normalizeEmail(),
+    check("email", "Please enter a valid email.").isEmail(),
     body(
       "password",
       "Please enter a password with only numbers and text and at least 5 characters."
@@ -55,16 +54,16 @@ router.post(
       .isEmail()
       .custom((value, { req }) => {
         return User.findOne({ email: value }).then((userDoc) => {
-          if (!userDoc) {
+          if (userDoc) {
             return Promise.reject("E-Mail Already Verified!");
           }
         });
       })
-      .normalizeEmail(),
   ],
   authController.postResend
 );
 
+//Todo: also remove the user from all connections and chats
 router.delete("/delete",isAuth,authController.getDelete);
 
 export default router;

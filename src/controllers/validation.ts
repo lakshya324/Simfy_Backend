@@ -36,18 +36,10 @@ export const getVerify = async (
       ...temp_user.user,
       connections: [],
     });
-    try {
-      await user.save();
-      await TempUser.findByIdAndDelete(userId);
-    } catch (error) {
-      return next(error);
-    }
-    try {
-      verifiedMail(user.email, user._id.toString());
-    } catch (error) {
-      console.log(`Error While Sending Emails in Verify: ${error}`);
-    }
-    return res.status(201).json({ message: "User Verified!" });
+    await user.save();
+    await TempUser.findByIdAndDelete(userId);
+    verifiedMail(user.email, user._id.toString());
+    return res.status(201).json({ success: true, message: "User Verified!" });
   } catch (error) {
     return next(error);
   }
@@ -84,29 +76,18 @@ export const postGenerateOTP = async (
 
     const isAlreadySent = await OTP.findOne({ email: email });
     if (isAlreadySent) {
-        const error = new Error("OTP already sent!");
-        (error as StatusError).statusCode = 429;
-        return next(error);
+      const error = new Error("OTP already sent!");
+      (error as StatusError).statusCode = 429;
+      return next(error);
     }
     const otp = generateOTP(6);
     const otpDoc = new OTP({
       email: email,
       otp: otp,
     });
-    try {
-      await otpDoc.save();
-    } catch (error) {
-      return next(error);
-    }
-    try {
-      await forgotPasswordMail(email, otp);
-    } catch (err) {
-        console.log(`Error While Sending Emails in OTP: ${err}`);
-        const error = new Error("Error While Sending OTP!");
-        (error as StatusError).statusCode = 500;
-        return next(error);
-    }
-    return res.status(200).json({ message: "OTP sent!" });
+    await otpDoc.save();
+    await forgotPasswordMail(email, otp);
+    return res.status(200).json({ success: true, message: "OTP sent!" });
   } catch (error) {
     return next(error);
   }
@@ -156,19 +137,10 @@ export const postResetPassword = async (
     }
     const encryptedPassword = await bcrypt.hash(password, saltRounds);
     user.password = encryptedPassword;
-    try {
-      await user.save();
-      await OTP.findByIdAndDelete(otpDoc._id);
-    } catch (error) {
-      return next(error);
-    }
-
-    try {
-      passwordChangedMail(email);
-    } catch (error) {
-      console.log(`Error While Sending Emails in Reset: ${error}`);
-    }
-    return res.status(200).json({ message: "Password Reset!" });
+    await user.save();
+    await OTP.findByIdAndDelete(otpDoc._id);
+    passwordChangedMail(email);
+    return res.status(200).json({ success: true, message: "Password Reset!" });
   } catch (error) {
     return next(error);
   }

@@ -15,6 +15,7 @@ import {
 } from "../emails/emailUtils";
 import { decodeString, generateOTP } from "../utils/encoding";
 import OTP from "../models/otp";
+import messageHandler from "../handlers/messageHandler";
 
 export const postSignup = async (
   req: AuthRequest,
@@ -49,19 +50,13 @@ export const postSignup = async (
         password: encryptedPassword,
       },
     });
-    try {
-      await temp_user.save();
-    } catch (error) {
-      return next(error);
-    }
-    try {
-      validationMail(email, temp_user._id.toString());
-    } catch (error) {
-      console.log(`Error While Sending Emails in Signup: ${error}`);
-    }
-    return res
-      .status(201)
-      .json({ isVerify: false, emailSent: true, message: "User Created!" });
+    await temp_user.save();
+    validationMail(email, temp_user._id.toString());
+    return res.status(201).json({
+      success: true,
+      message: "User Created!",
+      data: { isVerify: false, emailSent: true },
+    });
   } catch (error) {
     return next(error);
   }
@@ -98,20 +93,22 @@ export const postLogin = async (
       } else {
         if (!emailCoolDown(temp_user.emailLastSent)) {
           return res.status(200).json({
-            isVerify: false,
-            emailSent: false,
+            success: true,
             message: "Email not verified!",
+            data: {
+              isVerify: false,
+              emailSent: false,
+            },
           });
         } else {
-          try {
-            validationMail(email, temp_user._id.toString());
-          } catch (error) {
-            console.log(`Error While Sending Emails in Login: ${error}`);
-          }
+          validationMail(email, temp_user._id.toString());
           return res.status(200).json({
-            isVerify: false,
-            emailSent: true,
-            message: "Email not verified!",
+            success: true,
+            message: "Email not verified, Resend Validation Email!",
+            data: {
+              isVerify: false,
+              emailSent: true,
+            },
           });
         }
       }
@@ -123,7 +120,11 @@ export const postLogin = async (
         return next(error);
       }
       const token = createToken({ userId: user._id.toString() });
-      return res.status(200).json({ token: token });
+      return res.status(200).json({
+        success: true,
+        message: "Login Successful!",
+        data: { token: token },
+      });
     }
   } catch (error) {
     return next(error);
@@ -137,6 +138,23 @@ export const postResend = async (
 ) => {
   try {
     const email = req.body.email;
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      // console.log(errors.array());
+      const error = new Error(`Validation Error! ${errors.array()[0].msg}`);
+      (error as StatusError).statusCode = 422;
+      return next(error);
+    }
+
+    // const isUser = await User.findOne({ email: email });
+    // console.log(isUser,email);
+    // if (isUser) {
+    //   const error = new Error("Email already exists!");
+    //   (error as StatusError).statusCode = 422;
+    //   return next(error);
+    // }
+
     const temp_user = await TempUser.findOne({ "user.email": email });
     if (!temp_user) {
       const error = new Error("User not found!");
@@ -145,9 +163,12 @@ export const postResend = async (
     }
     if (!emailCoolDown(temp_user.emailLastSent)) {
       return res.status(200).json({
-        isVerify: false,
-        emailSent: false,
+        success: true,
         message: "Email sent recently!",
+        data: {
+          isVerify: false,
+          emailSent: false,
+        },
       });
     } else {
       try {
@@ -158,9 +179,12 @@ export const postResend = async (
         console.log(`Error While Sending Emails in Resend: ${error}`);
       }
       return res.status(200).json({
-        isVerify: false,
-        emailSent: true,
+        success: true,
         message: "Email sent!",
+        data: {
+          isVerify: false,
+          emailSent: true,
+        },
       });
     }
   } catch (error) {
@@ -206,7 +230,7 @@ export const getDelete = async (
       return next(error);
     }
     await User.findByIdAndDelete(userId);
-    return res.status(200).json({ message: "User Deleted!" });
+    return res.status(200).json({ success: true, message: "User Deleted!" });
   } catch (error) {
     return next(error);
   }

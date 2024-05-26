@@ -8,14 +8,12 @@ router.get("/verify/:userId", validationController.getVerify);
 
 router.post("/otp",[
     check("email", "Please enter a valid email.")
-      .isEmail()
-      .normalizeEmail(),
+      .isEmail(),
   ],validationController.postGenerateOTP);
 
   router.post("/reset",[
     check("email", "Please enter a valid email.")
-      .isEmail()
-      .normalizeEmail(),
+      .isEmail(),
     body(
       "password",
       "Please enter a password with only numbers and text and at least 5 characters."

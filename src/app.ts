@@ -46,6 +46,13 @@ app.use("/validate", validateRoutes);
 app.use("/chats", chatRoutes);
 app.use("/ml", mlRoutes);
 
+//* 404 Middleware
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const error = new Error("Not Found") as any;
+  error.statusCode = 404;
+  next(error);
+});
+
 //* Error Handling Middleware
 app.use(
   (error: StatusError, req: AuthRequest, res: Response, next: NextFunction) => {
@@ -54,7 +61,7 @@ app.use(
     const message = error.message;
     // const data = error.data;
     // res.status(status).json({ message: message, data: data });
-    res.status(status).json({ error: message });
+    res.status(status).json({success:false, message: message});
   }
 );
 
