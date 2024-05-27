@@ -36,8 +36,8 @@ app.use((req: AuthRequest, res: Response, next: NextFunction) => {
 //* Seting up Socket
 setupSocket(io);
 
-//TODO: Add Default to S3 Bucket	
-app.use("/images", express.static(path.join(__dirname, "../public/images")));
+// No Need for static folder as all Images are stored in Cloud
+// app.use("/images", express.static(path.join(__dirname, "../public/images")));
 
 //* Routes
 app.use(authRoutes);

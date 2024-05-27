@@ -3,7 +3,7 @@ import { AuthRequest, StatusError } from "../types/types";
 import User from "../models/user";
 import ChatDB from "../models/chats";
 import { deliveredDispose, deliveredSeenDispose } from "../utils/dispose";
-import client from "../middleware/s3";
+import client from "../config/s3";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { s3BucketName, uploadFolderName } from "../config/config";
 import ImageDB from "../models/images";

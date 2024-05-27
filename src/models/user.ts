@@ -1,5 +1,5 @@
 import mongoose, { Connection, Schema } from "mongoose";
-import { url } from "../config/config";
+import { url,s3BucketName } from "../config/config";
 import { v4 as uuidv4 } from "uuid";
 
 const userSchema = new Schema({
@@ -31,7 +31,7 @@ const userSchema = new Schema({
   },
   profileImage: {
     type: String,
-    default: url+"/images/default/default.png",
+    default: `https://${s3BucketName}.s3.amazonaws.com/images/default/default.png`,
   },
   connections: [
     {

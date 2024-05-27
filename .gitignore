@@ -42,7 +42,7 @@ build/Release
 node_modules/
 jspm_packages/
 temp/
-public/images/profile_pics/
+public/images/
 
 # Snowpack dependency directory (https://snowpack.dev/)
 web_modules/

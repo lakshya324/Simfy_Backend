@@ -1,5 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
-import { awsAccessKeyId, awsSecretAccessKey, awsRegion } from "../config/config";
+import { awsAccessKeyId, awsSecretAccessKey, awsRegion } from "./config";
 
 const s3Client = new S3Client({
   credentials: {

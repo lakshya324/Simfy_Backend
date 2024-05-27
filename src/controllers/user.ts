@@ -87,7 +87,7 @@ export const postUpdate = async (
   }
 };
 
-// TODO: modifty this function to get connections details as well
+// todo: modify to return specific fields
 export const getConnections = async (
   req: AuthRequest,
   res: Response,
@@ -100,7 +100,7 @@ export const getConnections = async (
       (error as StatusError).statusCode = 422;
       return next(error);
     }
-    const user = await User.findById(userId).sort({
+    const user = await User.findById(userId).populate('connections.from').sort({
       "connections.last_updated": -1,
     });
     if (!user) {
